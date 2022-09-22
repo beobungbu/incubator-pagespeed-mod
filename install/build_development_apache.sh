@@ -112,6 +112,8 @@ echo Apache build done
 
 echo Installing Apache in $TARGET ...
 make install
+run sudo a2enmod ssl
+run sudo systemctl restart apache2
 
 echo Building mod_fcgid
 cd "$third_party/mod_fcgid"
