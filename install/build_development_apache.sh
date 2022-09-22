@@ -72,20 +72,24 @@ if [ -z "$(ls)" ]; then
   echo "and then try again?"
   exit 1
 fi
-
+status  "goto $third_party/apr/src"
 cd "$third_party/apr/src"
 ./buildconf --prefix=$TARGET
 ./configure --prefix=$TARGET
 make
+status "make install-j1"
 make install -j1
 
+status "cd $third_party/aprutil/src"
 cd "$third_party/aprutil/src"
 ./buildconf --with-apr="$third_party/apr/src" --prefix=$TARGET
 ./configure --with-apr="$third_party/apr/src" --prefix=$TARGET
 make
+status "make install"
 make install
 
 if [ "$HTTPD_DIR" = "httpd24" ]; then
+  status "nghttp2 depends on Apache 2.4+, so only build it for 2.4."
   # nghttp2 depends on Apache 2.4+, so only build it for 2.4.
   cd "$third_party/nghttp2"
   echo "Configuring nghttp2"
@@ -96,8 +100,9 @@ if [ "$HTTPD_DIR" = "httpd24" ]; then
   make install
   CONFIGURE_ARGS="$CONFIGURE_ARGS --enable-http2 --with-nghttp2=$TARGET"
 fi
-
+status "CONFIGURE_ARGS = $CONFIGURE_ARGS"
 # Now actually configure, build, and install Apache.
+status "cd $third_party/$HTTPD_DIR/src"
 cd "$third_party/$HTTPD_DIR/src"
 ./buildconf --prefix=$TARGET \
   --with-apr="$third_party/apr/src" --with-apr-util="$third_party/aprutil/src"
